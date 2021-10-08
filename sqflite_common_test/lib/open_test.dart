@@ -619,7 +619,7 @@ void run(SqfliteTestContext context) {
 
     // without the synchronized fix, this could faild
     for (var i = 0; i < 100; i++) {
-      unawaited(helper.getDb());
+      (helper.getDb());
     }
     var db = (await helper.getDb())!;
     await db.close();

@@ -193,15 +193,15 @@ void main() {
       var db = await openDatabase(path, version: 1);
       try {
         expect(await db.getVersion(), 1);
-        unawaited(db.close());
+        (db.close());
 
         db = await openDatabase(path, version: 2);
         expect(await db.getVersion(), 2);
-        unawaited(db.close());
+        (db.close());
 
         db = await openDatabase(path, version: 1);
         expect(await db.getVersion(), 1);
-        unawaited(db.close());
+        (db.close());
 
         db = await openDatabase(path, version: 1);
         expect(await db.getVersion(), 1);

@@ -787,7 +787,7 @@ class OpenTestPage extends TestPage {
       try {
         expect(await db.getVersion(), 1);
         // close no wait
-        unawaited(db.close());
+        (db.close());
         final db2 = await factory.openDatabase(path,
             options: OpenDatabaseOptions(version: 1));
         print('$db, $db2');
