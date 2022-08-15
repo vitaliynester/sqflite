@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-import '../model/item.dart';
+import 'package:sqflite_example/model/item.dart';
 
 /// Item widget.
 class ItemWidget extends StatefulWidget {
@@ -19,6 +17,7 @@ class ItemWidget extends StatefulWidget {
   final Function(Item item) onTap; // = Function(MainItem item);
 
   @override
+  // ignore: library_private_types_in_public_api
   _ItemWidgetState createState() => _ItemWidgetState();
 }
 

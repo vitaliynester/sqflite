@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:sqflite_example/src/common_import.dart';
 import 'package:sqflite_example/src/expect.dart';
 
@@ -52,6 +51,7 @@ class TestPage extends StatefulWidget {
   }
 
   @override
+  // ignore: library_private_types_in_public_api
   _TestPageState createState() => _TestPageState();
 }
 

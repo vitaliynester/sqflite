@@ -1,3 +1,20 @@
+## 2.0.3+1
+
+* MacOS: Fix crash when an invalid number of parameters is specified in the query
+
+## 2.0.3
+
+* iOS/Android: Flutter 3.0 support, makes all the channel calls happen on thread pool instead of the UI thread
+* iOS/MacOS: make close happen in a background thread
+
+## 2.0.2+1
+
+* Android build: remove jcenter, compile sdk set to 31
+
+## 2.0.1
+
+* Bump default android thread priority to `THREAD_PRIORITY_DEFAULT`
+
 ## 2.0.0+4
 
 * `nnbd` support
