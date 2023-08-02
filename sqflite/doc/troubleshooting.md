@@ -19,8 +19,9 @@ Sample `analysis_options.yaml` file:
 
 ```
 analyzer:
-  strong-mode:
-    implicit-casts: false
+    language:
+    strict-casts: true
+    strict-inference: true
 ```
 
 # Common issues
@@ -36,7 +37,7 @@ Unhandled exception: type '_InternalLinkedHashMap' is not a subtype of type 'Map
 ```
 
 Make sure you create object of type `Map<String, Object?>` and not simply `Map` for records you
-insert and update. The option `implicit-casts: false` explained above helps to find such issues
+insert and update. The option `language: strict-casts: false` explained above helps to find such issues
 
 ## MissingPluginException
 
@@ -94,7 +95,8 @@ Before raising this issue, try adding another well established plugin (the simpl
 
 ## Warning database has been locked for... 
 
-I you get this output in debug mode:
+If you get this output in debug mode:
+
 > Warning database has been locked for 0:00:10.000000. Make sure you always use the transaction object for database operations during a transaction
 
 One common mistake is to use the db object in a transaction:
@@ -202,12 +204,71 @@ end
 Since Flutter templates change over time for new sdk, you might sometimes try to delete the ios folder and re-create
 your project.
 
+### XCode 14 support
+
+You might likely get the following error:
+
+```
+Error (Xcode): File not found: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/arc/libarclite_iphonesimulator.a
+```
+
+See: https://developer.apple.com/forums/thread/728021
+
+Xcode 14 only supports building for a deployment target of iOS 11.
+
+Here as well you need to enforce the deployment target until I find a better way
+as the FMDB dependency is no longer actively maintained.
+
+In your application Podfile inside the post_install section where you have this in the
+app template:
+
+```
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+  end
+end
+```
+
+you need to have 
+(11 is used here, but you might want to specify a higher platform):
+
+```
+post_install do |installer|
+
+  installer.generated_projects.each do |project|
+    project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+      end
+    end
+  end
+
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+  end
+end
+```
+
+### Module 'FMDB' not found
+
+Since v2.2.1-1, you might encounter `Module 'FMDB' not found` on old projects.
+
+You need to add `use_frameworks!` in your Podfile:
+
+```
+target 'Runner' do
+  # Needed since v2.2.1-1
+  # In newly create project, this is set but it is not
+  # always the case on older projects
+  use_frameworks!
+  ...
+end
+```
+
 ## Error in Flutter web
 
-As far as i know, the web does not support sqlite in any acceptable ways (yes there are in memory solution but no 
-persistency, see https://github.com/tekartik/sqflite/issues/212).
-
-Since there is no decent solution on the web, as of today, support is not planned.
+Look at package [sqflite_common_ffi_web](https://pub.dev/packages/sqflite_common_ffi_web) for experimental Web support.
 
 IndexedDB or any solution on top of it should be considered for storage on the Web.
 

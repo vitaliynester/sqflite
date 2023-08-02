@@ -6,23 +6,13 @@ import 'test_scenario.dart';
 
 void main() {
   group('transaction', () {
-    final openStep = [
-      'openDatabase',
-      {'path': ':memory:', 'singleInstance': true},
-      1
-    ];
-    final closeStep = [
-      'closeDatabase',
-      {'id': 1},
-      null
-    ];
     final transactionBeginStep = [
       'execute',
       {
         'sql': 'BEGIN IMMEDIATE',
-        'arguments': null,
         'id': 1,
-        'inTransaction': true
+        'inTransaction': true,
+        'transactionId': null
       },
       null,
     ];
@@ -30,25 +20,25 @@ void main() {
       'execute',
       {
         'sql': 'BEGIN IMMEDIATE',
-        'arguments': null,
         'id': 1,
-        'inTransaction': true
+        'inTransaction': true,
+        'transactionId': null
       },
       SqfliteDatabaseException('failure', null),
     ];
     final transactionEndStep = [
       'execute',
-      {'sql': 'COMMIT', 'arguments': null, 'id': 1, 'inTransaction': false},
+      {'sql': 'COMMIT', 'id': 1, 'inTransaction': false},
       1
     ];
     test('basic', () async {
       final scenario = startScenario([
-        openStep,
+        protocolOpenStep,
         transactionBeginStep,
         transactionEndStep,
         transactionBeginStep,
         transactionEndStep,
-        closeStep,
+        protocolCloseStep,
       ]);
       final factory = scenario.factory;
       final db = await factory.openDatabase(inMemoryDatabasePath);
@@ -58,13 +48,13 @@ void main() {
       await db.close();
       scenario.end();
     });
-    test('error in begin', () async {
+    test('error in begin after open', () async {
       final scenario = startScenario([
-        openStep,
+        protocolOpenStep,
         transactionBeginFailureStep,
         transactionBeginStep,
         transactionEndStep,
-        closeStep,
+        protocolCloseStep,
       ]);
       final factory = scenario.factory;
       final db = await factory.openDatabase(inMemoryDatabasePath);
@@ -79,19 +69,20 @@ void main() {
     });
     test('error in begin during open', () async {
       final scenario = startScenario([
-        openStep,
+        protocolOpenStep,
         [
           'query',
-          {'sql': 'PRAGMA user_version', 'arguments': null, 'id': 1},
+          {'sql': 'PRAGMA user_version', 'id': 1},
+          // ignore: inference_failure_on_collection_literal
           {},
         ],
         [
           'execute',
           {
             'sql': 'BEGIN EXCLUSIVE',
-            'arguments': null,
             'id': 1,
-            'inTransaction': true
+            'inTransaction': true,
+            'transactionId': null
           },
           SqfliteDatabaseException('failure', null),
         ],
@@ -99,13 +90,13 @@ void main() {
           'execute',
           {
             'sql': 'ROLLBACK',
-            'arguments': null,
             'id': 1,
+            'transactionId': -1,
             'inTransaction': false
           },
           null,
         ],
-        closeStep,
+        protocolCloseStep,
       ]);
       final factory = scenario.factory;
       try {

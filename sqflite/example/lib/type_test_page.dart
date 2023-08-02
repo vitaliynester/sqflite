@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_example/utils.dart';
 
 import 'test_page.dart';
 
@@ -144,7 +143,10 @@ class TypeTestPage extends TestPage {
         //print(await getValue(id));
         //assert(eq.equals(await getValue(id), []));
 
-        final blob1234 = [1, 2, 3, 4];
+        var blob1234 = [1, 2, 3, 4];
+        if (!supportsCompatMode) {
+          blob1234 = Uint8List.fromList(blob1234);
+        }
         id = await insertValue(blob1234);
         dynamic value = (await getValue(id)) as List;
         print(value);
@@ -156,14 +158,10 @@ class TypeTestPage extends TestPage {
             .rawQuery('SELECT hex(value) FROM Test WHERE id = ?', [id]);
         expect(hexResult[0].values.first, '01020304');
 
-        // try blob lookup - does work on iOS only
+        // try blob lookup (works on Android since 2022-09-19)
         var rows = await data.db
             .rawQuery('SELECT * FROM Test WHERE value = ?', [blob1234]);
-        if (Platform.isIOS || Platform.isMacOS) {
-          expect(rows.length, 1);
-        } else {
-          expect(rows.length, 0);
-        }
+        expect(rows.length, 1);
 
         // try blob lookup using hex
         rows = await data.db.rawQuery(
@@ -240,8 +238,10 @@ class TypeTestPage extends TestPage {
         } on ArgumentError catch (_) {
           failed = true;
         }
-        print('for now bool are accepted but inconsistent on iOS/Android');
-        expect(failed, isFalse);
+        if (supportsCompatMode) {
+          print('for now bool are accepted but inconsistent on iOS/Android');
+          expect(failed, isFalse);
+        }
       } finally {
         await data.db.close();
       }

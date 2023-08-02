@@ -1,12 +1,15 @@
 name: sqflite
-homepage: https://github.com/tekartik/sqflite/tree/master/sqflite
+repository: https://github.com/tekartik/sqflite/tree/master/sqflite
+issue_tracker: https://github.com/tekartik/sqflite/issues
 description: Flutter plugin for SQLite, a self-contained, high-reliability,
   embedded, SQL database engine.
-version: 2.0.3+1
+version: 2.3.0
+funding:
+  - https://github.com/sponsors/alextekartik
 
 environment:
-  sdk: '>=2.16.0 <3.0.0'
-  flutter: ">=3.0.0"
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.3.0"
 
 flutter:
   plugin:
@@ -14,15 +17,18 @@ flutter:
       android:
         package: com.tekartik.sqflite
         pluginClass: SqflitePlugin
+        dartPluginClass: SqflitePlugin
       ios:
         pluginClass: SqflitePlugin
+        dartPluginClass: SqflitePlugin
       macos:
         pluginClass: SqflitePlugin
+        dartPluginClass: SqflitePlugin
 
 dependencies:
   flutter:
     sdk: flutter
-  sqflite_common: '>=2.2.1+1 <4.0.0'
+  sqflite_common: '>=2.5.0-1 <4.0.0'
   path: '>=1.8.0 <3.0.0'
 
 dev_dependencies:
